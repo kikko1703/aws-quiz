@@ -22,8 +22,7 @@
     "spiegazione": "Amazon Inspector è progettato specificamente per scansionare le istanze EC2 alla ricerca di vulnerabilità software. Trusted Advisor offre consigli generali sull'account, mentre GuardDuty è un servizio di rilevamento minacce intelligente."
   },
   {
-    "testo": "Topic 1 A company has a centralized group of users with large file storage requirements that have exceeded the space available on premises. The
-company wants to extend its file storage capabilities for this group while retaining the performance benefit of sharing content locally. What is the MOST operationally efficient AWS solution for this scenario?",
+    "testo": "Topic 1 A company has a centralized group of users with large file storage requirements that have exceeded the space available on premises. The company wants to extend its file storage capabilities for this group while retaining the performance benefit of sharing content locally. What is the MOST operationally efficient AWS solution for this scenario?",
     "opzioni": [
       "Create an Amazon S3 bucket for each user.",
       "Configure and deploy an AWS Storage Gateway file gateway.",
