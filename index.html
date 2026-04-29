@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Practitioner Simulator Pro</title>
+    <style>
+        :root { 
+            --aws-blue: #161e27; 
+            --aws-orange: #ff9900; 
+            --aws-dark-bg: #0f141a; 
+            --aws-light-text: #ffffff; 
+            --card-bg: #1c252e;     
+            --success: #2ecc71; 
+            --error: #e74c3c; 
+        }
+        
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--aws-dark-bg); 
+            color: var(--aws-light-text); 
+            margin: 0; 
+            padding: 20px; 
+        }
+
+        .container { 
+            max-width: 850px; 
+            margin: 0 auto; 
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            min-height: 450px; 
+            border: 1px solid #333;
+        }
+
+        /* CLASSE FONDAMENTALE MANCANTE */
+        .hidden { display: none !important; }
+        
+        .menu h1 { color: var(--aws-orange); }
+        
+        .btn-menu { 
+            display: block; 
+            width: 100%; 
+            max-width: 350px; 
+            margin: 15px auto; 
+            padding: 18px; 
+            font-size: 1.1em; 
+            font-weight: bold; 
+            cursor: pointer; 
+            border-radius: 8px; 
+            border: 2px solid var(--aws-orange); 
+            background: transparent; 
+            color: var(--aws-orange); 
+            transition: 0.3s; 
+        }
+        
+        .btn-menu:hover { 
+            background: var(--aws-orange); 
+            color: var(--aws-dark-bg); 
+        }
+
+        .header { 
+            border-bottom: 2px solid var(--aws-orange); 
+            padding-bottom: 10px; 
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option { 
+            display: block; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border: 2px solid #3e4b59; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            background: #252f3a;
+            transition: 0.2s; 
+        }
+        
+        .option:hover { border-color: var(--aws-orange); }
+
+        .correct-opt { 
+            border-color: var(--success) !important; 
+            background: rgba(46, 204, 113, 0.2) !important; 
+            color: #2ecc71;
+        }
+        
+        .wrong-opt { 
+            border-color: var(--error) !important; 
+            background: rgba(231, 76, 60, 0.2) !important; 
+            color: #e74c3c;
+        }
+
+        input[type="number"] {
+            background: #0f141a;
+            border: 1px solid var(--aws-orange);
+            color: white;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .progress-bar { background: #333; height: 10px; border-radius: 5px; margin-bottom: 20px; }
+        .progress-fill { background: var(--aws-orange); height: 100%; width: 0%; transition: 0.3s; border-radius: 5px; }
+        
+        button#action-btn { 
+            background: var(--aws-orange); 
+            color: var(--aws-dark-bg); 
+            border: none; 
+            padding: 12px 30px; 
+            border-radius: 5px; 
+            font-weight: bold; 
+            cursor: pointer; 
+        }
+
+        #explanation {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #252f3a;
+            border-left: 5px solid var(--aws-orange);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="main-container">
+    <div id="menu-screen" class="menu">
+        <h1>AWS Practitioner Simulator</h1>
+        <p>Scegli come vuoi studiare:</p>
+        <button class="btn-menu" onclick="avviaQuiz('esame')">SIMULAZIONE ESAME<br><small>(65 domande casuali - feedback finale)</small></button>
+        <button class="btn-menu" onclick="avviaQuiz('esercizio')">ESERCITAZIONE CASUALE<br><small>(65 domande casuali - feedback immediato)</small></button>
+        <button class="btn-menu" onclick="avviaQuiz('sequenziale')">PERCORSO SEQUENZIALE<br><small>(Dalla 1 alla 720 - feedback immediato)</small></button>
+        <button id="resume-btn" class="btn-menu hidden" onclick="riprendiSequenziale()">RIPRENDI SEQUENZIALE<br><small id="resume-info"></small></button>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+        <div class="header">
+            <div style="display: flex; flex-direction: column;">
+                <span id="mode-title" style="font-weight: bold;"></span>
+                <div id="jump-container" class="hidden" style="margin-top: 5px;">
+                    <span style="font-size: 0.8em;">Vai a: </span>
+                    <input type="number" id="jump-input" min="1" style="width: 50px; padding: 2px;">
+                    <button onclick="saltaADomanda()" style="background: #555; color: white; border: none; cursor: pointer; padding: 2px 10px; border-radius: 3px;">Vai</button>
+                </div>
+            </div>
+            <span id="counter"></span>
+        </div>
+        <div class="progress-bar"><div id="progress" class="progress-fill"></div></div>
+        <div class="question-text" id="question-body" style="margin-bottom: 20px; font-size: 1.1em;"></div>
+        <div id="options-container"></div>
+        <div id="explanation" class="hidden"></div>
+        <div class="footer" style="margin-top: 30px; display: flex; justify-content: space-between; align-items: center;">
+            <span id="hint" style="font-size: 0.9em; color: #aaa;"></span>
+            <button id="action-btn" onclick="gestisciClick()">Invia Risposta</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let database = [];
+    let sessione = [];
+    let indice = 0;
+    let corretteCount = 0;
+    let modalita = ''; 
+    let feedbackAttivo = false;
+    let logRisposte = [];
+
+    // Caricamento dati
+    fetch('domande.json')
+        .then(res => res.json())
+        .then(data => {
+            database = data;
+            checkSalvataggi();
+        })
+        .catch(err => console.error("Errore caricamento JSON:", err));
+
+    function checkSalvataggi() {
+        const lastIndex = localStorage.getItem('aws_quiz_last_index');
+        if (lastIndex !== null) {
+            document.getElementById('resume-btn').classList.remove('hidden');
+            document.getElementById('resume-info').innerText = `Ultima domanda: ${parseInt(lastIndex) + 1}`;
+        }
+    }
+
+    function avviaQuiz(tipo) {
+        modalita = tipo;
+        indice = 0;
+        corretteCount = 0;
+        logRisposte = [];
+        
+        document.getElementById('menu-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        
+        const jumpCont = document.getElementById('jump-container');
+        
+        if (tipo === 'sequenziale') {
+            sessione = [...database];
+            jumpCont.classList.remove('hidden');
+            document.getElementById('mode-title').innerText = "Percorso Sequenziale";
+        } else {
+            jumpCont.classList.add('hidden');
+            sessione = database.sort(() => 0.5 - Math.random()).slice(0, 65);
+            document.getElementById('mode-title').innerText = tipo === 'esame' ? "Simulazione Esame" : "Esercitazione Casuale";
+        }
+        mostraDomanda();
+    }
+
+    function riprendiSequenziale() {
+        modalita = 'sequenziale';
+        indice = parseInt(localStorage.getItem('aws_quiz_last_index')) || 0;
+        sessione = [...database];
+        document.getElementById('menu-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        document.getElementById('jump-container').classList.remove('hidden');
+        document.getElementById('mode-title').innerText = "Percorso Sequenziale (Ripreso)";
+        mostraDomanda();
+    }
+
+    function mostraDomanda() {
+        const q = sessione[indice];
+        const isMultiple = Array.isArray(q.corretta);
+        feedbackAttivo = false;
+
+        // Reset UI
+        document.getElementById('explanation').classList.add('hidden');
+        document.getElementById('counter').innerText = `Domanda ${indice + 1} di ${sessione.length}`;
+        document.getElementById('progress').style.width = `${((indice) / sessione.length) * 100}%`;
+        document.getElementById('question-body').innerText = q.testo;
+        document.getElementById('hint').innerText = isMultiple ? "Scegli più risposte" : "Scegli una risposta";
+        
+        const btn = document.getElementById('action-btn');
+        btn.innerText = "Invia Risposta";
+        btn.style.background = "var(--aws-orange)";
+
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+
+        q.opzioni.forEach((opt, i) => {
+            const label = document.createElement('label');
+            label.className = 'option';
+            label.id = `opt-${i}`;
+            const type = isMultiple ? 'checkbox' : 'radio';
+            label.innerHTML = `<input type="${type}" name="ans" value="${i}"> ${opt}`;
+            container.appendChild(label);
+        });
+
+        if (modalita === 'sequenziale') {
+            localStorage.setItem('aws_quiz_last_index', indice);
+        }
+    }
+
+    function gestisciClick() {
+        if (feedbackAttivo) {
+            prossima();
+        } else {
+            valida();
+        }
+    }
+
+    function valida() {
+        const selezionati = Array.from(document.querySelectorAll('input[name="ans"]:checked')).map(el => parseInt(el.value));
+        if (selezionati.length === 0) return alert("Seleziona una risposta!");
+
+        const q = sessione[indice];
+        let esatto = false;
+
+        if (Array.isArray(q.corretta)) {
+            esatto = selezionati.length === q.corretta.length && selezionati.every(v => q.corretta.includes(v));
+        } else {
+            esatto = selezionati[0] === q.corretta;
+        }
+
+        if (esatto) corretteCount++;
+        logRisposte.push({ q, selezionati, esatto });
+
+        if (modalita === 'esercizio' || modalita === 'sequenziale') {
+            mostraFeedback(q, selezionati);
+        } else {
+            prossima();
+        }
+    }
+
+    function mostraFeedback(q, selezionati) {
+        feedbackAttivo = true;
+        const btn = document.getElementById('action-btn');
+        btn.innerText = "Continua";
+        
+        const explainBox = document.getElementById('explanation');
+        explainBox.classList.remove('hidden');
+        const testoSpiegazione = q.spiegazione || "Nessuna spiegazione dettagliata disponibile.";
+        explainBox.innerHTML = `<strong style="color: var(--aws-orange);">Spiegazione:</strong><p style="font-size: 0.9em; margin-top: 10px;">${testoSpiegazione}</p>`;
+
+        q.opzioni.forEach((_, i) => {
+            const label = document.getElementById(`opt-${i}`);
+            const isGiusta = Array.isArray(q.corretta) ? q.corretta.includes(i) : q.corretta === i;
+            
+            if (isGiusta) {
+                label.classList.add('correct-opt');
+                label.innerHTML += " ✅";
+            } else if (selezionati.includes(i)) {
+                label.classList.add('wrong-opt');
+                label.innerHTML += " ❌";
+            }
+            label.querySelector('input').disabled = true;
+        });
+    }
+
+    function prossima() {
+        indice++;
+        if (indice < sessione.length) {
+            mostraDomanda();
+        } else {
+            alert(`Fine quiz! Risposte corrette: ${corretteCount} su ${sessione.length}`);
+            if (modalita === 'sequenziale') localStorage.removeItem('aws_quiz_last_index');
+            location.reload();
+        }
+    }
+
+    function saltaADomanda() {
+        const val = parseInt(document.getElementById('jump-input').value);
+        if (isNaN(val) || val < 1 || val > sessione.length) {
+            alert("Numero non valido");
+            return;
+        }
+        indice = val - 1;
+        mostraDomanda();
+    }
+</script>
+</body>
+</html>
