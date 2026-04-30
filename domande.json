@@ -1149,7 +1149,7 @@
       "Creation of security group rules for outbound access",
       "Application of Amazon EC2 operating system patches"
     ],
-    "corretta": 2,
+    "corretta": 1,
     "spiegazione": "AWS è responsabile della sicurezza 'DEL' cloud, che include la protezione fisica dei data center. Il cliente è responsabile della sicurezza 'NEL' cloud (patch OS, configurazione firewall, permessi IAM)."
   },
   {
