@@ -154,6 +154,25 @@
         <button class="btn-menu" onclick="avviaQuiz('sequenziale')">PERCORSO SEQUENZIALE<br><small>(Dalla 1 alla 720 - feedback immediato)</small></button>
         <button id="resume-btn" class="btn-menu hidden" onclick="riprendiSequenziale()">RIPRENDI SEQUENZIALE<br><small id="resume-info"></small></button>
     </div>
+      <div class="menu-item" style="margin-top: 15px; border: 1px solid #444; padding: 10px; border-radius: 8px;">
+    <p>MODALITÀ BLOCCHI (65 domande):</p>
+    <select id="select-blocco" style="width: 100%; padding: 10px; margin-bottom: 10px; background: #252f3a; color: white; border: 1px solid var(--aws-orange);">
+        <option value="0">Blocco 1 (Domande 1-65)</option>
+        <option value="1">Blocco 2 (Domande 66-130)</option>
+        <option value="2">Blocco 3 (Domande 131-195)</option>
+        <option value="3">Blocco 4 (Domande 196-260)</option>
+        <option value="4">Blocco 5 (Domande 261-325)</option>
+        <option value="5">Blocco 6 (Domande 326-390)</option>
+        <option value="6">Blocco 7 (Domande 391-455)</option>
+        <option value="7">Blocco 8 (Domande 456-520)</option>
+        <option value="8">Blocco 9 (Domande 521-585)</option>
+        <option value="9">Blocco 10 (Domande 586-650)</option>
+        <option value="10">Blocco 11 (Domande 651-715)</option>
+        <option value="11">Blocco 12 (Domande 716-720)</option>
+    </select>
+    <button class="btn-menu" onclick="avviaQuiz('blocco')">AVVIA BLOCCO SELEZIONATO</button>
+</div>
+
 
     <div id="quiz-screen" class="hidden">
         <div class="header">
@@ -212,27 +231,42 @@
     }
 
     function avviaQuiz(tipo) {
-        modalita = tipo;
-        indice = 0;
-        corretteCount = 0;
-        logRisposte = [];
-        
-        document.getElementById('menu-screen').classList.add('hidden');
-        document.getElementById('quiz-screen').classList.remove('hidden');
-        
-        const jumpCont = document.getElementById('jump-container');
-        
-        if (tipo === 'sequenziale') {
-            sessione = [...database];
-            jumpCont.classList.remove('hidden');
-            document.getElementById('mode-title').innerText = "Percorso Sequenziale";
-        } else {
-            jumpCont.classList.add('hidden');
-            sessione = database.sort(() => 0.5 - Math.random()).slice(0, 65);
-            document.getElementById('mode-title').innerText = tipo === 'esame' ? "Simulazione Esame" : "Esercitazione Casuale";
-        }
-        mostraDomanda();
+    modalita = tipo;
+    corretteCount = 0;
+    indice = 0;
+    logRisposte = [];
+    
+    let domandeSelezionate = [];
+
+    // GESTIONE DELLE MODALITÀ
+    if (tipo === 'blocco') {
+        const numBlocco = parseInt(document.getElementById('select-blocco').value);
+        const start = numBlocco * 65;
+        const end = start + 65;
+        // Prendiamo le 65 domande di quel blocco specifico
+        domandeSelezionate = database.slice(start, end);
+    } else if (tipo === 'esame') {
+        // 65 domande casuali da tutto il database
+        domandeSelezionate = [...database].sort(() => 0.5 - Math.random()).slice(0, 65);
+    } else if (tipo === 'esercizio') {
+        // Altre 65 domande casuali (puoi cambiare il numero se vuoi)
+        domandeSelezionate = [...database].sort(() => 0.5 - Math.random()).slice(0, 65);
+    } else if (tipo === 'sequenziale') {
+        // Tutte le domande in ordine dalla 1 alla 720
+        domandeSelezionate = [...database];
     }
+
+    // MESCOLAMENTO DELLE RISPOSTE (shuffle)
+    // Trasformiamo ogni domanda originale in una domanda con opzioni mescolate
+    sessione = domandeSelezionate.map(d => shuffleOptions(d));
+
+    // CAMBIO SCHERMATA
+    document.getElementById('menu-screen').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
+    
+    // Avvia la prima domanda
+    mostraDomanda();
+}
 
     function riprendiSequenziale() {
         modalita = 'sequenziale';
@@ -391,6 +425,22 @@ function mostraRiepilogo() {
         indice = val - 1;
         mostraDomanda();
     }
+    function shuffleOptions(domanda) {
+    // Creiamo un array di oggetti per tenere traccia dell'indice originale
+    let opzioniConIndice = domanda.opzioni.map((opz, i) => ({ testo: opz, originale: i }));
+    
+    // Mescoliamo l'array
+    for (let i = opzioniConIndice.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [opzioniConIndice[i], opzioniConIndice[j]] = [opzioniConIndice[j], opzioniConIndice[i]];
+    }
+
+    // Aggiorniamo la domanda con le nuove opzioni e ricalcoliamo l'indice della corretta
+    const nuoveOpzioni = opzioniConIndice.map(o => o.testo);
+    const nuovoIndiceCorretto = opzioniConIndice.findIndex(o => o.originale === domanda.corretta);
+
+    return { ...domanda, opzioni: nuoveOpzioni, corretta: nuovoIndiceCorretto };
+}
 </script>
 </body>
 </html>
