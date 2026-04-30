@@ -122,6 +122,25 @@
             background: #252f3a;
             border-left: 5px solid var(--aws-orange);
         }
+        .result-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    background: #252f3a;
+    border-left: 5px solid #333;
+}
+.result-item.correct { border-left-color: var(--success); }
+.result-item.wrong { border-left-color: var(--error); }
+
+.res-text { font-weight: bold; margin-bottom: 10px; display: block; }
+.res-ans { font-size: 0.9em; margin: 5px 0; }
+.res-expl { 
+    font-size: 0.85em; 
+    margin-top: 10px; 
+    padding-top: 10px; 
+    border-top: 1px solid #444; 
+    color: #aaa;
+}
     </style>
 </head>
 <body>
@@ -157,6 +176,13 @@
             <button id="action-btn" onclick="gestisciClick()">Invia Risposta</button>
         </div>
     </div>
+    <!-- Schermata dei Risultati Finali -->
+        <div id="result-screen" class="hidden">
+            <h2 style="color: var(--aws-orange); margin-bottom: 10px;">Riepilogo Esame</h2>
+            <div id="score-summary" style="font-size: 1.2em; margin-bottom: 20px; padding: 15px; background: #252f3a; border-radius: 8px; text-align: center;"></div>
+            <div id="results-list"></div>
+            <button class="btn-menu" style="margin-top: 20px; width: 100%;" onclick="location.reload()">Torna al Menu Principal</button>
+        </div>
 </div>
 
 <script>
@@ -309,15 +335,52 @@
     }
 
     function prossima() {
-        indice++;
-        if (indice < sessione.length) {
-            mostraDomanda();
-        } else {
-            alert(`Fine quiz! Risposte corrette: ${corretteCount} su ${sessione.length}`);
-            if (modalita === 'sequenziale') localStorage.removeItem('aws_quiz_last_index');
-            location.reload();
-        }
+    indice++;
+    if (indice < sessione.length) {
+        mostraDomanda();
+    } else {
+        // Invece dell'alert, mostriamo il riepilogo
+        mostraRiepilogo();
     }
+}
+
+function mostraRiepilogo() {
+    // Nascondi il quiz e mostra i risultati
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('result-screen').classList.remove('hidden');
+
+    const summary = document.getElementById('score-summary');
+    const percent = Math.round((corretteCount / sessione.length) * 100);
+    summary.innerHTML = `Punteggio: <strong>${corretteCount} / ${sessione.length}</strong> (${percent}%)`;
+
+    const list = document.getElementById('results-list');
+    list.innerHTML = '';
+
+    logRisposte.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = `result-item ${item.esatto ? 'correct' : 'wrong'}`;
+
+        // Determina il testo delle risposte date
+        const tueRisposte = item.selezionati.map(idx => item.q.opzioni[idx]).join(", ");
+        
+        // Determina il testo delle risposte corrette
+        const indiciCorretti = Array.isArray(item.q.corretta) ? item.q.corretta : [item.q.corretta];
+        const risposteCorrette = indiciCorretti.map(idx => item.q.opzioni[idx]).join(", ");
+
+        div.innerHTML = `
+            <span class="res-text">${i + 1}. ${item.q.testo}</span>
+            <div class="res-ans"><strong>Tua risposta:</strong> <span style="color:${item.esatto ? '#2ecc71' : '#e74c3c'}">${tueRisposte} ${item.esatto ? '✅' : '❌'}</span></div>
+            ${!item.esatto ? `<div class="res-ans"><strong>Corretta:</strong> <span style="color:#2ecc71">${risposteCorrette}</span></div>` : ''}
+            <div class="res-expl"><strong>Spiegazione:</strong> ${item.q.spiegazione || 'Consultare documentazione AWS.'}</div>
+        `;
+        list.appendChild(div);
+    });
+
+    // Se eravamo in modalità sequenziale, resettiamo il salvataggio perché finito
+    if (modalita === 'sequenziale') {
+        localStorage.removeItem('aws_quiz_last_index');
+    }
+}
 
     function saltaADomanda() {
         const val = parseInt(document.getElementById('jump-input').value);
