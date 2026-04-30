@@ -123,7 +123,7 @@
       "Elimination of expenses for running and maintaining data centers",
       "Price discounts that are identical to discounts from hardware providers",
       "Distribution of all operational controls to AWS",
-      "Elimination of operational expenses",
+      "Elimination of operational expenses"
     ],
     "corretta": 0,
     "spiegazione": "Uno dei vantaggi principali del cloud è il passaggio da spese di capitale (CapEx) a spese operative (OpEx), eliminando i costi di gestione dei data center fisici[cite: 2]. Le spese operative totali non vengono eliminate, ma ottimizzate[cite: 2]."
