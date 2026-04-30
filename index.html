@@ -336,7 +336,7 @@
         if (esatto) corretteCount++;
         logRisposte.push({ q, selezionati, esatto });
 
-        if (modalita === 'esercizio' || modalita === 'sequenziale') {
+        if (modalita === 'esercizio' || modalita === 'sequenziale' || modalita === 'blocco') {
             mostraFeedback(q, selezionati);
         } else {
             prossima();
