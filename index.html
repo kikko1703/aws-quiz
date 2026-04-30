@@ -230,51 +230,68 @@
         }
     }
 
-    function avviaQuiz(tipo) {
-    modalita = tipo;
-    corretteCount = 0;
-    indice = 0;
-    logRisposte = [];
-    
-    let domandeSelezionate = [];
+    // Funzione corretta per mescolare opzioni singole o multiple
+    function shuffleOptions(domanda) {
+        let opzioniConIndice = domanda.opzioni.map((opz, i) => ({ testo: opz, originale: i }));
+        
+        for (let i = opzioniConIndice.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [opzioniConIndice[i], opzioniConIndice[j]] = [opzioniConIndice[j], opzioniConIndice[i]];
+        }
 
-    // GESTIONE DELLE MODALITÀ
-    if (tipo === 'blocco') {
-        const numBlocco = parseInt(document.getElementById('select-blocco').value);
-        const start = numBlocco * 65;
-        const end = start + 65;
-        // Prendiamo le 65 domande di quel blocco specifico
-        domandeSelezionate = database.slice(start, end);
-    } else if (tipo === 'esame') {
-        // 65 domande casuali da tutto il database
-        domandeSelezionate = [...database].sort(() => 0.5 - Math.random()).slice(0, 65);
-    } else if (tipo === 'esercizio') {
-        // Altre 65 domande casuali (puoi cambiare il numero se vuoi)
-        domandeSelezionate = [...database].sort(() => 0.5 - Math.random()).slice(0, 65);
-    } else if (tipo === 'sequenziale') {
-        // Tutte le domande in ordine dalla 1 alla 720
-        domandeSelezionate = [...database];
+        const nuoveOpzioni = opzioniConIndice.map(o => o.testo);
+        let nuovoIndiceCorretto;
+
+        if (Array.isArray(domanda.corretta)) {
+            // Se la risposta è multipla, mappiamo tutti i nuovi indici
+            nuovoIndiceCorretto = domanda.corretta.map(vecchioIdx => 
+                opzioniConIndice.findIndex(o => o.originale === vecchioIdx)
+            );
+        } else {
+            // Se è singola
+            nuovoIndiceCorretto = opzioniConIndice.findIndex(o => o.originale === domanda.corretta);
+        }
+
+        return { ...domanda, opzioni: nuoveOpzioni, corretta: nuovoIndiceCorretto };
     }
 
-    // MESCOLAMENTO DELLE RISPOSTE (shuffle)
-    // Trasformiamo ogni domanda originale in una domanda con opzioni mescolate
-    sessione = domandeSelezionate.map(d => shuffleOptions(d));
+    function avviaQuiz(tipo) {
+        modalita = tipo;
+        corretteCount = 0;
+        indice = 0;
+        logRisposte = [];
+        
+        let domandeSelezionate = [];
 
-    // CAMBIO SCHERMATA
-    document.getElementById('menu-screen').classList.add('hidden');
-    document.getElementById('quiz-screen').classList.remove('hidden');
-    
-    // Avvia la prima domanda
-    mostraDomanda();
-}
+        if (tipo === 'blocco') {
+            const numBlocco = parseInt(document.getElementById('select-blocco').value);
+            const start = numBlocco * 65;
+            const end = start + 65;
+            domandeSelezionate = database.slice(start, end);
+            document.getElementById('mode-title').innerText = `Blocco ${numBlocco + 1}`;
+        } else if (tipo === 'esame') {
+            domandeSelezionate = [...database].sort(() => 0.5 - Math.random()).slice(0, 65);
+            document.getElementById('mode-title').innerText = "Simulazione Esame";
+        } else if (tipo === 'esercizio') {
+            domandeSelezionate = [...database].sort(() => 0.5 - Math.random()).slice(0, 65);
+            document.getElementById('mode-title').innerText = "Esercitazione Casuale";
+        } else if (tipo === 'sequenziale') {
+            domandeSelezionate = [...database];
+            document.getElementById('mode-title').innerText = "Percorso Sequenziale";
+        }
+
+        sessione = domandeSelezionate.map(d => shuffleOptions(d));
+        document.getElementById('menu-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        mostraDomanda();
+    }
 
     function riprendiSequenziale() {
         modalita = 'sequenziale';
         indice = parseInt(localStorage.getItem('aws_quiz_last_index')) || 0;
-        sessione = [...database];
+        sessione = database.map(d => shuffleOptions(d)); // Shuffle anche qui per coerenza
         document.getElementById('menu-screen').classList.add('hidden');
         document.getElementById('quiz-screen').classList.remove('hidden');
-        document.getElementById('jump-container').classList.remove('hidden');
         document.getElementById('mode-title').innerText = "Percorso Sequenziale (Ripreso)";
         mostraDomanda();
     }
@@ -284,12 +301,11 @@
         const isMultiple = Array.isArray(q.corretta);
         feedbackAttivo = false;
 
-        // Reset UI
         document.getElementById('explanation').classList.add('hidden');
         document.getElementById('counter').innerText = `Domanda ${indice + 1} di ${sessione.length}`;
         document.getElementById('progress').style.width = `${((indice) / sessione.length) * 100}%`;
         document.getElementById('question-body').innerText = q.testo;
-        document.getElementById('hint').innerText = isMultiple ? "Scegli più risposte" : "Scegli una risposta";
+        document.getElementById('hint').innerText = isMultiple ? `Scegli ${q.corretta.length} risposte` : "Scegli una risposta";
         
         const btn = document.getElementById('action-btn');
         btn.innerText = "Invia Risposta";
@@ -304,6 +320,17 @@
             label.id = `opt-${i}`;
             const type = isMultiple ? 'checkbox' : 'radio';
             label.innerHTML = `<input type="${type}" name="ans" value="${i}"> ${opt}`;
+            
+            // Aggiungiamo un listener per evidenziare la selezione
+            label.addEventListener('click', () => {
+                if (!feedbackAttivo) {
+                    if (type === 'radio') {
+                        document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+                    }
+                    label.classList.toggle('selected');
+                }
+            });
+
             container.appendChild(label);
         });
 
@@ -322,11 +349,15 @@
 
     function valida() {
         const selezionati = Array.from(document.querySelectorAll('input[name="ans"]:checked')).map(el => parseInt(el.value));
-        if (selezionati.length === 0) return alert("Seleziona una risposta!");
-
         const q = sessione[indice];
-        let esatto = false;
+        const numRichiesti = Array.isArray(q.corretta) ? q.corretta.length : 1;
 
+        if (selezionati.length === 0) return alert("Seleziona almeno una risposta!");
+        if (Array.isArray(q.corretta) && selezionati.length !== numRichiesti) {
+            return alert(`Questa domanda richiede esattamente ${numRichiesti} risposte.`);
+        }
+
+        let esatto = false;
         if (Array.isArray(q.corretta)) {
             esatto = selezionati.length === q.corretta.length && selezionati.every(v => q.corretta.includes(v));
         } else {
@@ -350,8 +381,7 @@
         
         const explainBox = document.getElementById('explanation');
         explainBox.classList.remove('hidden');
-        const testoSpiegazione = q.spiegazione || "Nessuna spiegazione dettagliata disponibile.";
-        explainBox.innerHTML = `<strong style="color: var(--aws-orange);">Spiegazione:</strong><p style="font-size: 0.9em; margin-top: 10px;">${testoSpiegazione}</p>`;
+        explainBox.innerHTML = `<strong style="color: var(--aws-orange);">Spiegazione:</strong><p style="font-size: 0.9em; margin-top: 10px;">${q.spiegazione || "Nessuna spiegazione disponibile."}</p>`;
 
         q.opzioni.forEach((_, i) => {
             const label = document.getElementById(`opt-${i}`);
@@ -369,78 +399,44 @@
     }
 
     function prossima() {
-    indice++;
-    if (indice < sessione.length) {
-        mostraDomanda();
-    } else {
-        // Invece dell'alert, mostriamo il riepilogo
-        mostraRiepilogo();
+        indice++;
+        if (indice < sessione.length) {
+            mostraDomanda();
+        } else {
+            mostraRiepilogo();
+        }
     }
-}
 
-function mostraRiepilogo() {
-    // Nascondi il quiz e mostra i risultati
-    document.getElementById('quiz-screen').classList.add('hidden');
-    document.getElementById('result-screen').classList.remove('hidden');
-
-    const summary = document.getElementById('score-summary');
-    const percent = Math.round((corretteCount / sessione.length) * 100);
-    summary.innerHTML = `Punteggio: <strong>${corretteCount} / ${sessione.length}</strong> (${percent}%)`;
-
-    const list = document.getElementById('results-list');
-    list.innerHTML = '';
-
-    logRisposte.forEach((item, i) => {
-        const div = document.createElement('div');
-        div.className = `result-item ${item.esatto ? 'correct' : 'wrong'}`;
-
-        // Determina il testo delle risposte date
-        const tueRisposte = item.selezionati.map(idx => item.q.opzioni[idx]).join(", ");
-        
-        // Determina il testo delle risposte corrette
-        const indiciCorretti = Array.isArray(item.q.corretta) ? item.q.corretta : [item.q.corretta];
-        const risposteCorrette = indiciCorretti.map(idx => item.q.opzioni[idx]).join(", ");
-
-        div.innerHTML = `
-            <span class="res-text">${i + 1}. ${item.q.testo}</span>
-            <div class="res-ans"><strong>Tua risposta:</strong> <span style="color:${item.esatto ? '#2ecc71' : '#e74c3c'}">${tueRisposte} ${item.esatto ? '✅' : '❌'}</span></div>
-            ${!item.esatto ? `<div class="res-ans"><strong>Corretta:</strong> <span style="color:#2ecc71">${risposteCorrette}</span></div>` : ''}
-            <div class="res-expl"><strong>Spiegazione:</strong> ${item.q.spiegazione || 'Consultare documentazione AWS.'}</div>
-        `;
-        list.appendChild(div);
-    });
-
-    // Se eravamo in modalità sequenziale, resettiamo il salvataggio perché finito
-    if (modalita === 'sequenziale') {
-        localStorage.removeItem('aws_quiz_last_index');
+    function mostraRiepilogo() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.remove('hidden');
+        const summary = document.getElementById('score-summary');
+        const percent = Math.round((corretteCount / sessione.length) * 100);
+        summary.innerHTML = `Punteggio: <strong>${corretteCount} / ${sessione.length}</strong> (${percent}%)`;
+        const list = document.getElementById('results-list');
+        list.innerHTML = '';
+        logRisposte.forEach((item, i) => {
+            const div = document.createElement('div');
+            div.className = `result-item ${item.esatto ? 'correct' : 'wrong'}`;
+            const tueRisposte = item.selezionati.map(idx => item.q.opzioni[idx]).join(", ");
+            const indiciCorretti = Array.isArray(item.q.corretta) ? item.q.corretta : [item.q.corretta];
+            const risposteCorrette = indiciCorretti.map(idx => item.q.opzioni[idx]).join(", ");
+            div.innerHTML = `
+                <span class="res-text">${i + 1}. ${item.q.testo}</span>
+                <div class="res-ans"><strong>Tua risposta:</strong> <span style="color:${item.esatto ? '#2ecc71' : '#e74c3c'}">${tueRisposte} ${item.esatto ? '✅' : '❌'}</span></div>
+                ${!item.esatto ? `<div class="res-ans"><strong>Corretta:</strong> <span style="color:#2ecc71">${risposteCorrette}</span></div>` : ''}
+                <div class="res-expl"><strong>Spiegazione:</strong> ${item.q.spiegazione || 'Consultare documentazione AWS.'}</div>`;
+            list.appendChild(div);
+        });
+        if (modalita === 'sequenziale') localStorage.removeItem('aws_quiz_last_index');
     }
-}
 
     function saltaADomanda() {
         const val = parseInt(document.getElementById('jump-input').value);
-        if (isNaN(val) || val < 1 || val > sessione.length) {
-            alert("Numero non valido");
-            return;
-        }
+        if (isNaN(val) || val < 1 || val > sessione.length) return alert("Numero non valido");
         indice = val - 1;
         mostraDomanda();
     }
-    function shuffleOptions(domanda) {
-    // Creiamo un array di oggetti per tenere traccia dell'indice originale
-    let opzioniConIndice = domanda.opzioni.map((opz, i) => ({ testo: opz, originale: i }));
-    
-    // Mescoliamo l'array
-    for (let i = opzioniConIndice.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [opzioniConIndice[i], opzioniConIndice[j]] = [opzioniConIndice[j], opzioniConIndice[i]];
-    }
-
-    // Aggiorniamo la domanda con le nuove opzioni e ricalcoliamo l'indice della corretta
-    const nuoveOpzioni = opzioniConIndice.map(o => o.testo);
-    const nuovoIndiceCorretto = opzioniConIndice.findIndex(o => o.originale === domanda.corretta);
-
-    return { ...domanda, opzioni: nuoveOpzioni, corretta: nuovoIndiceCorretto };
-}
-</script>
+</script>    
 </body>
 </html>
