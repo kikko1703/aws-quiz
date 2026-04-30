@@ -1282,7 +1282,7 @@
     "spiegazione": "S3 File Gateway permette di collegare applicazioni on-premises via NFS o SMB direttamente a Amazon S3, mappando i file come oggetti nel bucket."
   },
   {
-    "testo": "Topic 1 A company needs to track the activity in its AWS accounts... know when an API call is made. Which AWS tool can be used?",
+    "testo": "Topic 1 A company needs to track the activity in its AWS accounts, and needs to know when an API call is made against its AWS resources. Which AWS tool can be used?",
     "opzioni": [
       "Amazon CloudWatch",
       "Amazon Inspector",
@@ -1315,7 +1315,7 @@
     "spiegazione": "Amazon Personalize è il servizio di machine learning basato sulla stessa tecnologia usata da Amazon.com per creare raccomandazioni personalizzate in tempo reale."
   },
   {
-    "testo": "Topic 1 A company is planning its migration... identifying capability gaps using CAF perspectives. Which phase of the cloud transformation journey is this?",
+    "testo": "Topic 1 A company is planning its migration to AWS Cloud. The company is identifying its capability gaps using CAF perspectives. Which phase of the cloud transformation journey is this?",
     "opzioni": [
       "Envision",
       "Align",
@@ -1325,6 +1325,10 @@
     "corretta": 1,
     "spiegazione": "Nella fase di 'Align' del CAF, l'organizzazione identifica le lacune nelle competenze e nei processi e crea un piano d'azione per allineare l'IT al business."
   },
+
+
+
+  
   {
     "testo": "Topic 1 A social media company wants to protect its web application from common web exploits such as SQL injections. Which AWS service will meet these requirements?",
     "opzioni": [
