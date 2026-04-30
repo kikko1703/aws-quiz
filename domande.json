@@ -1325,10 +1325,6 @@
     "corretta": 1,
     "spiegazione": "Nella fase di 'Align' del CAF, l'organizzazione identifica le lacune nelle competenze e nei processi e crea un piano d'azione per allineare l'IT al business."
   },
-
-
-
-  
   {
     "testo": "Topic 1 A social media company wants to protect its web application from common web exploits such as SQL injections. Which AWS service will meet these requirements?",
     "opzioni": [
@@ -1558,7 +1554,7 @@
     "spiegazione": "La prospettiva 'Business' si occupa di trasformare i dati in asset aziendali. La 'Data monetization' (monetizzazione dei dati) è una capacità specifica per creare valore economico dai dati nel cloud."
   },
   {
-    "testo": "Topic 1 A company is assessing its AWS Business Support plan... considering switching to Enterprise Support. Which additional benefit will the company receive?",
+    "testo": "Topic 1 A company is assessing its AWS Business Support plan to determine if the plan still meets the company’s needs. The company is considering switching to Enterprise Support. Which additional benefit will the company receive?",
     "opzioni": [
       "A full set of AWS Trusted Advisor checks",
       "Phone, email, and chat access to cloud support engineers",
@@ -1698,7 +1694,7 @@
     "spiegazione": "Il cliente è sempre responsabile dei propri dati (sicurezza 'NEL' cloud). AWS si occupa dell'hardware, della sicurezza fisica e della manutenzione dei componenti di base della rete."
   },
   {
-    "testo": "Topic 1 A company wants its Amazon EC2 instances to operate in a highly available environment, anche in caso di disastro naturale. Quale approccio achieves this?",
+    "testo": "Topic 1 A company wants its Amazon EC2 instances to operate in a highly available environment,  even if there is a natural disaster in a particular geographic area. Which approach will achieve this goal? ",
     "opzioni": [
       "Use EC2 instances in multiple AWS Regions.",
       "Use EC2 instances in multiple Amazon CloudFront locations.",
@@ -1742,7 +1738,7 @@
     "spiegazione": "Una Availability Zone (AZ) è costituita da uno o più data center discreti, dotati di alimentazione, raffreddamento e connettività fisica ridondanti all'interno di una Regione."
   },
   {
-    "testo": "Topic 1 A company must migrate 50 petabytes of file storage data to AWS with the least possible operational overhead. Which service?",
+    "testo": "A company is moving an on-premises data center to the AWS Cloud. The company must migrate 50 petabytes of file storage data to AWS with the least possible operational overhead. Which AWS service or resource should the company use to meet these requirements?",
     "opzioni": [
       "AWS Snowmobile",
       "AWS Snowball Edge",
@@ -1753,7 +1749,7 @@
     "spiegazione": "Per volumi di dati enormi come 50 PB (Petabyte), AWS Snowmobile è la soluzione corretta. Si tratta di un container trasportato da un autoarticolato capace di trasferire fino a 100 PB, operazione che via internet richiederebbe anni."
   },
   {
-    "testo": "Topic 1 A company has an application with robust hardware requirements... Which AWS service will help... without investing in backend infrastructure or high-end client hardware?",
+    "testo": "Topic 1 A company has an application with robust hardware requirements. The application must be accessed by students who are using lightweight, lowcost laptops. Which AWS service will help the company deploy the application without investing in backend infrastructure or high-end client hardware?",
     "opzioni": [
       "Amazon AppStream 2.0",
       "AWS AppSync",
@@ -1764,7 +1760,7 @@
     "spiegazione": "Amazon AppStream 2.0 è un servizio di streaming di applicazioni completamente gestito. Permette agli utenti di accedere ad applicazioni desktop pesanti tramite un browser web su computer poco potenti, poiché l'elaborazione avviene sui server AWS."
   },
   {
-    "testo": "Topic 1 A company wants to query its server logs to gain insights... Which AWS service will store this data MOST cost-effectively?",
+    "testo": "Topic 1 A company wants to query its server logs to gain insights about its customers’ experiences. Which AWS service will store this data MOST cost-effectively?",
     "opzioni": [
       "Amazon Aurora",
       "Amazon Elastic File System (Amazon EFS)",
@@ -1778,8 +1774,8 @@
     "testo": "Topic 1 Which of the following is a recommended design principle for AWS Cloud architecture?",
     "opzioni": [
       "Design tightly coupled components.",
-      "Build a single application component...",
-      "Make large changes on fewer iterations...",
+      "Build a single application component that can handle all the application functionality.  ",
+      "Make large changes on fewer iterations to reduce chances of failure. ",
       "Avoid monolithic architecture by segmenting workloads."
     ],
     "corretta": 3,
@@ -1801,14 +1797,14 @@
     "opzioni": [
       "Management of the guest operating systems",
       "Maintenance of infrastructure devices",
-      "Management of host operating systems...",
+      "Management of host operating systems and virtualization",
       "Maintenance of Availability Zones software"
     ],
     "corretta": 0,
     "spiegazione": "Nel modello IaaS (come EC2), AWS gestisce l'host fisico e l'hypervisor, ma il cliente è pienamente responsabile della gestione, del patching e della sicurezza del sistema operativo 'guest' installato sull'istanza."
   },
   {
-    "testo": "Topic 1 A company wants to automatically add and remove Amazon EC2 instances... adjust to varying workloads dynamically. Which service?",
+    "testo": "Topic 1 A company wants to automatically add and remove Amazon EC2 instances. The company wants the EC2 instances to adjust to varying workloads dynamically. Which service or feature will meet these requirements?",
     "opzioni": [
       "Amazon DynamoDB",
       "Amazon EC2 Spot Instances",
@@ -1819,7 +1815,7 @@
     "spiegazione": "Amazon EC2 Auto Scaling aiuta a mantenere la disponibilità delle applicazioni aggiungendo o rimuovendo automaticamente istanze EC2 in base a condizioni definite (come il carico della CPU), garantendo l'elasticità."
   },
   {
-    "testo": "Topic 1 A user wants to securely automate the management and rotation of credentials... LEAST amount of time. Which service?",
+    "testo": "Topic 1 A user wants to securely automate the management and rotation of credentials that are shared between applications, while spending the LEAST amount of time. Which service or feature can be used to accomplish this?",
     "opzioni": [
       "AWS CloudHSM",
       "AWS KMS",
@@ -1843,10 +1839,10 @@
   {
     "testo": "Topic 1 Which actions are best practices for an AWS account root user? (Choose two.)",
     "opzioni": [
-      "Share root user credentials...",
-      "Create multiple root users...",
+      "Share root user credentials with team members.",
+      "Create multiple root users for the account, separated by environment.",
       "Enable MFA on the root user.",
-      "Create an IAM user with administrator privileges...",
+      "Create an IAM user with administrator privileges for daily administrative tasks, instead of using the root user.",
       "Use programmatic access instead of password."
     ],
     "corretta": [
@@ -1856,7 +1852,7 @@
     "spiegazione": "AWS raccomanda caldamente di proteggere l'utente root con l'MFA e di smettere di usarlo per i compiti quotidiani, creando invece un utente IAM con poteri amministrativi per la gestione ordinaria."
   },
   {
-    "testo": "Topic 1 A company is running a critical workload on RDS... highly available with recovery time < 5 minutes. Which solution?",
+    "testo": "Topic 1 A company is running a critical workload on RDS DB instance. The company needs the DB instance to be highly available with recovery time < 5 minutes. Which solution?",
     "opzioni": [
       "Create a read replica.",
       "Create a template using CloudFormation.",
@@ -1944,22 +1940,22 @@
     "spiegazione": "Usare i ruoli IAM per le applicazioni è una best practice fondamentale: permette di concedere permessi temporanei e sicuri senza dover gestire chiavi di accesso statiche e potenzialmente vulnerabili."
   },
   {
-    "testo": "Topic 1 How does AWS provide agility for users?",
+    "testo": "Topic 1 A company wants to know more about the benefits offered by cloud computing. The company wants to understand the operational advantage of agility. How does AWS provide agility for users?",
     "opzioni": [
-      "Ensure high availability...",
-      "Pay-as-you-go model...",
-      "Transfer infrastructure management...",
+      "The ability the ensure high availability by deploying workloads to multiple regions",
+      "A pay-as-you-go model for many services and resources.",
+      "The ability to transfer infrastructure management to the AWS Cloud.",
       "The ability to provision and deprovision resources quickly"
     ],
     "corretta": 3,
     "spiegazione": "L'agilità nel cloud deriva dalla capacità di sperimentare velocemente. Poter creare e distruggere intere infrastrutture in pochi minuti permette alle aziende di innovare senza i tempi lunghi dell'hardware fisico."
   },
   {
-    "testo": "Topic 1 A company needs a central user portal to log in to third-party applications supporting SAML 2.0. Which service?",
+    "testo": "Topic 1 A company needs a central user portal so that users can log in to third-party business applications that support Security Assertion Markup Language (SAML) 2.0. Which AWS service will meet this requirement?",
     "opzioni": [
       "IAM",
       "Amazon Cognito",
-      "AWS IAM Identity Center",
+      "AWS IAM Identity Center (AWS Single Sign-On)",
       "AWS CLI"
     ],
     "corretta": 2,
@@ -1977,7 +1973,7 @@
     "spiegazione": "L'AWS Health Dashboard fornisce informazioni in tempo reale sullo stato dei servizi AWS e notifiche personalizzate quando eventi specifici potrebbero influenzare le tue risorse."
   },
   {
-    "testo": "Topic 1 Which AWS tool can capture information about inbound and outbound traffic in a VPC?",
+    "testo": "Topic 1 Which AWS tool can capture information about inbound and outbound traffic in an Amazon VPC?",
     "opzioni": [
       "VPC Flow Logs",
       "Amazon Inspector",
@@ -2021,7 +2017,7 @@
     "spiegazione": "Amazon Inspector è un servizio di sicurezza automatizzato che aiuta a migliorare la sicurezza e la conformità delle applicazioni distribuite su EC2 scansionandole per vulnerabilità software."
   },
   {
-    "testo": "Topic 1 A company gathering on-premises info like hostname, IP, and MAC address for migration. Which service?",
+    "testo": "Topic 1 A company plans to migrate to the AWS Cloud. The company is gathering information about its on-premises infrastructure and requires information such as the hostname, IP address, and MAC address. Which AWS service will meet these requirements?",
     "opzioni": [
       "AWS DataSync",
       "AWS Application Migration Service",
@@ -2034,14 +2030,25 @@
   {
     "testo": "Topic 1 Which action will help increase security in the AWS Cloud?",
     "opzioni": [
-      "Enable programmatic access for all.",
-      "Use IAM users instead of roles.",
+      "Enable programmatic access for all IAM users.",
+      "Use IAM users instead of IAM roles to delegate permissions.",
       "Rotate access keys on a reoccurring basis.",
-      "Use inline policies instead of managed policies."
+      "Use inline policies instead of customer managed policies."
     ],
     "corretta": 2,
     "spiegazione": "La rotazione regolare delle Access Key è una best practice di sicurezza fondamentale. Riduce il tempo in cui una chiave compromessa può essere utilizzata da un malintenzionato."
   },
+
+
+
+
+
+
+
+
+
+
+  
   {
     "testo": "Topic 1 A company wants to analyze its readiness for migration. Which tool or set of resources?",
     "opzioni": [
